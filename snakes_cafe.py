@@ -10,8 +10,10 @@
 from textwrap import dedent
 import sys
 
-WIDTH = 96
 
+WIDTH = 96
+no = {'no', 'n', 'nay', 'no thanks', 'jog on mate', 'that\'s all'}
+yes = {'yes', 'y', 'ye', 'sure', 'fuck yeah dawg', 'please', ''}
 
 # SEAT = [
 #     {
@@ -27,14 +29,17 @@ APP = [
     {
         'item': 'Tarantula Crisp',
         'count': 0,
+        'price': 9,
     },
     {
         'item': 'Crickett Platter',
         'count': 0,
+        'price': 7,
     },
     {
         'item': 'Mouse Kabob',
         'count': 0,
+        'price': 7,
     },
 ]
 
@@ -45,14 +50,17 @@ ENT = [
     {
         'item': 'Roadkill',
         'count': 0,
+        'price': 12,
     },
     {
         'item': 'Brazed Housecat',
         'count': 0,
+        'price': 15,
     },
     {
         'item': 'Human Infant',
         'count': 0,
+        'price': 22,
     },
 ]
 
@@ -63,14 +71,17 @@ DES = [
     {
         'item': 'Mice-cream',
         'count': 0,
+        'price': 5,
     },
     {
         'item': 'Frog-yo',
         'count': 0,
+        'price': 5,
     },
     {
         'item': 'Rabbit Souffle',
         'count': 0,
+        'price': 13,
     },
 ]
 
@@ -81,14 +92,17 @@ BEV = [
     {
         'item': 'Rattlesnake',
         'count': 0,
+        'price': 9,
     },
     {
         'item': 'Snake Eyes',
         'count': 0,
+        'price': 9,
     },
     {
         'item': 'Milk Snake',
         'count': 0,
+        'price': 6,
     },
 ]
 
@@ -99,34 +113,52 @@ def ask_question(question):
     return input(question)
 
 
+initial_order = True
+
+
 def take_order():
-    initial_order = True
+    global no
+    global yes
+    global initial_order
+
     ordering = True
-    no = {'no', 'n', 'nay', 'no thanks', 'jog on mate', 'that\'s all'}
 
     while ordering:
-        if initial_order:
-            item = input('What can I get ya?').lower()
+        phrase_one = 'What can I get ya?\n'
+        phrase_two = 'Anything else?\n'
+
+        if not initial_order:
+            item = input(f'''{phrase_two}''').lower()
         else:
-            item = input('Anything else?').lower()
+            item = input(f'''{phrase_one}''').lower()
 
-        if item == no:
-            pass
+        for i in range(len(MENU)):
+            for j in range(len(MENU[i])-1):
+                if(MENU[i][j+1]['item']).lower() == item:
+                    MENU[i][j+1]['count'] += 1
+                    print(dedent(f'''
+                        Ok, that\'s {str(MENU[i][j+1]['count'])}
+                        {str(MENU[i][j+1]['item'])}.
+                    '''))
 
-        else:
-            check_input(item)
+        initial_order = False
 
-            for i in range(len(MENU)):
-                for j in range(len(MENU[i])-1):
-                    if(MENU[i][j+1]['item']).lower() == item:
-                        MENU[i][j+1]['count'] += 1
-                        print(dedent(f'''
-                            Ok, that's going to be {str(MENU[i][j+1]['count'])} {str(MENU[i][j+1]['item'])}
-                        '''))
-                        initial_order = False
-                        take_order()
-                    else:
-                        ordering = False
+        if item == 'yes':
+            print('What can I get ya?')
+
+        if item == 'no':
+            ordering = False
+            read_order()
+            break
+
+
+def read_order():
+    print('\nORDER\n')
+    for i in range(len(MENU)):
+            for j in range(len(MENU[i])-1):
+                if(MENU[i][j+1]['count']) > 0:
+
+                    print(MENU[i][j+1]['count'], MENU[i][j+1]['item'], (MENU[i][j+1]['count'] * MENU[i][j+1]['price']))
 
 
 def check_input(user_in):
@@ -135,17 +167,18 @@ def check_input(user_in):
 
 
 def order_ready():
-    yes = {'yes', 'y', 'ye', 'sure', 'Fuck yeah dawg', ''}
-    ready = input('Ready to order?')
+    global yes
+    ready = input('Ready to order?\n')
     if ready in yes:
         take_order()
     else:
-        print('look we\'re busy so make up your mind.')
+        print('look hun, we\'re busy so make up your mind.\n')
         order_ready()
 
 
 def give_menu():
 
+    print('MENU')
     for i in range(len(MENU)):
 
         print(dedent(f'''
