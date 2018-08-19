@@ -6,6 +6,7 @@ import csv
 
 
 # globals
+initial_order = True
 WIDTH = 66
 menu_set = False
 menu = {}
@@ -91,7 +92,6 @@ class Order:
 
     def modify_order(self, order):
 
-        print('in modify_order')
         try:
             item = str(order[0])
         except IndexError:
@@ -119,19 +119,21 @@ class Order:
                         # if subtracting from order
                         if quantity < 0:
                             # subtracting, check order for presence
-                            if food in self.items:
-                                # is present, check for overdraw, if ok make change to order and stock
-                                if self.items[item] - quantity >= 0:
-                                    # order shrinks
+                            if item in self.items:
+
+                                if (self.items[item] + quantity) >= 0:
                                     self.items[item] += quantity
-                                    # bill drops
                                     self.total += (quantity * menu[cat][food]['price'])
-                                    # stock expands
                                     menu[cat][food]['stock'] -= quantity
-                                    # feedback
                                     print(f'''{abs(quantity)} {item} has been removed from your order.''')
+                                    print('Anyting else?\n')
+                                else:
+                                    print('wat?')
+
                             else:
                                 print('I\'m sorry, you haven\'t ordered any of those.')
+                                print('Anyting else?\n')
+
                         # if adding to order
                         if quantity > 0:
                             # check stock
@@ -145,15 +147,44 @@ class Order:
                                     self.items[item] = int(quantity)
                                 # and bill
                                 self.total += (quantity * menu[cat][food]['price'])
-                                print(self.items)
+                                print(f'''{abs(quantity)} {item} has been added to your order.''')
+                                # print(f'''{self.items[item]} {item} on your order now, for {self.items[item] * menu[cat][food]['price']}''')
+                                print('Anyting else?\n')
+
+
+    def display_order(self):
+
+        for item in self.items:
+            print(f'{self.items[item]} {item}')
+        print(f'Total: {self.total}')
+        take_order()
+
+    #TODO needs to be called:
+
+    def print_receipt(self):
+        r = 50
+        print('Order', self.id)
+        print('=' * r)
+        for item in self.items:
+            print(f'{self.items[item]} {item}')
+        print(f'Total: {self.total}')
+        ln_one = 'Python Diner'
+        ln_two = 'sssuper goood'
+
+        print(dedent(f'''
+        {'=' * r}
+        {(' ' * ((r - len(ln_one)) // 2)) + ln_one +
+            (' ' * ((r - len(ln_one)) // 2))}
+        {(' ' * ((r - len(ln_two)) // 2)) + ln_two +
+            (' ' * ((r - len(ln_two)) // 2))}
+        {'='* r}'''))
 
 
 order = Order()
 
 
 def take_order():
-
-    initial_order = True
+    global initial_order
 
     if initial_order:
         initial_order = False
@@ -193,7 +224,7 @@ def print_menu():
         for food in menu[cat]:
             print(dedent(f'''{food}{'.' *
             (WIDTH - 1 -len(food) -
-            len(str(menu[cat][food]['price'])))}${menu[cat][food]['price']}'''))
+            len(str(menu[cat][food]['price'])))} $ {menu[cat][food]['price']}'''))
     print('')
 
 
@@ -233,7 +264,7 @@ def core():
 
     while True:
 
-        prompt = str(input(f'''{chr(3847)}   ''')).lower()
+        prompt = str(input(f'''{chr(8811)}   ''')).lower()
 
         if prompt == 'quit':
             exit()
@@ -264,8 +295,12 @@ def core():
 
                 order.modify_order([prompt.split(' ')[0].lower(), prompt.split(' ')[1]])
 
+        if prompt == 'show order':
+            order.display_order()
+
         if prompt == '':
             pass
+
 
 def exit():
     print(dedent('''
