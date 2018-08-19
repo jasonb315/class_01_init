@@ -119,7 +119,7 @@ class Order:
                         # if subtracting from order
                         if quantity < 0:
                             # subtracting, check order for presence
-                            if food in order.items:
+                            if food in self.items:
                                 # is present, check for overdraw, if ok make change to order and stock
                                 if self.items[item] - quantity >= 0:
                                     # order shrinks
@@ -128,7 +128,7 @@ class Order:
                                     self.total += (quantity * menu[cat][food]['price'])
                                     # stock expands
                                     menu[cat][food]['stock'] -= quantity
-                                    # feedback{
+                                    # feedback
                                     print(f'''{abs(quantity)} {item} has been removed from your order.''')
                             else:
                                 print('I\'m sorry, you haven\'t ordered any of those.')
@@ -139,12 +139,13 @@ class Order:
                                 # make food
                                 menu[cat][food]['stock'] -= quantity
                                 # serve
-                                self.items[item] = int(quantity)
-                                print(self.items[item])
-                                print(self.items)
-
+                                if item in self.items:
+                                    self.items[item] += int(quantity)
+                                else:
+                                    self.items[item] = int(quantity)
                                 # and bill
                                 self.total += (quantity * menu[cat][food]['price'])
+                                print(self.items)
 
 
 order = Order()
