@@ -1,4 +1,4 @@
-from textwrap import dedent
+    from textwrap import dedent
 import sys
 
 
@@ -84,4 +84,5 @@ def run():
 
 
 if __name__ == '__main__':
+    run()if __name__ == '__main__':
     run()

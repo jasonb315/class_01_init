@@ -9,186 +9,254 @@
 
 from textwrap import dedent
 import sys
-
+import uuid
+# prompt = input(f'''{chr(3847)} ''')
 
 WIDTH = 96
-no = {'no', 'n', 'nay', 'no thanks', 'jog on mate', 'that\'s all'}
+
+no = {'no', 'n', 'nay', 'no thanks', 'jog on mate', 'that\'s all', 'nope'}
 yes = {'yes', 'y', 'ye', 'sure', 'fuck yeah dawg', 'please', ''}
 
-# SEAT = [
-#     {
-#         'question': 'How many today?\n',
-#         'answer': '0',
-#     },
-# ]
+SPE = {
+    '01': 'Ready to order? what can I get ya?\n',
+    '02': 'Anyting else?\n',
+}
 
-APP = [
-    {
-        'header': 'APPETIZERSss',
-    },
-    {
-        'item': 'Tarantula Crisp',
-        'count': 0,
-        'price': 9,
-    },
-    {
-        'item': 'Crickett Platter',
-        'count': 0,
-        'price': 7,
-    },
-    {
-        'item': 'Mouse Kabob',
-        'count': 0,
-        'price': 7,
-    },
-]
+ordering = True
 
-ENT = [
-    {
-        'header': 'ENTRESss',
-    },
-    {
-        'item': 'Roadkill',
-        'count': 0,
-        'price': 12,
-    },
-    {
-        'item': 'Brazed Housecat',
-        'count': 0,
-        'price': 15,
-    },
-    {
-        'item': 'Human Infant',
-        'count': 0,
-        'price': 22,
-    },
-]
+# MENU dic, SECTION dic, key item : vals being count and price
+MENU = {}
 
-DES = [
-    {
-        'header': 'DESSSERTSss',
-    },
-    {
-        'item': 'Mice-cream',
-        'count': 0,
-        'price': 5,
-    },
-    {
-        'item': 'Frog-yo',
-        'count': 0,
-        'price': 5,
-    },
-    {
-        'item': 'Rabbit Souffle',
-        'count': 0,
-        'price': 13,
-    },
-]
+D_MENU = {
 
-BEV = [
-    {
-        'header': 'BEVERAGESss',
-    },
-    {
-        'item': 'Rattlesnake',
-        'count': 0,
-        'price': 9,
-    },
-    {
-        'item': 'Snake Eyes',
-        'count': 0,
-        'price': 9,
-    },
-    {
-        'item': 'Milk Snake',
-        'count': 0,
-        'price': 6,
-    },
-]
+    'APPETIZERSss':
+        {
+            'Tarantula Crisp': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+            'Crickett Platter': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+            'Mouse Kabob': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+        },
 
-MENU = [APP, ENT, DES, BEV]
+    'ENTRESss':
+        {
+            'Roadkill': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+            'Brazed Housecat': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+            'Human Infant': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+        },
+
+    'DESERTSss':
+        {
+            'Mice-cream': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+            'Frog-yo': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+            'Rabbit Souffle': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+        },
+
+    'BEVERAGESss':
+        {
+            'Rattlesnake': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+            'Snake Eyes': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+            'Milk Snake': {
+                'price': 9.99,
+                'ordered': 0,
+                'stock': 10
+            },
+        },
+}
 
 
-def ask_question(question):
-    return input(question)
+class Order:
+    def __init__(self):
+        self.receipt = {'subtotal': 0}
+        self.id = str(uuid.uuid4())
+
+    def __repr__(self):
+        return f'''Order: {self.id} | Items: {self.receipt['subtotal']} | Total: {len(self.receipt)}'''
+
+    def __len__(self):
+        return len(self.receipt)
+
+    def add_item(self, item, quantity):
+        try:
+            flag = False
+            for key, value in MENU.items():
+                if item in MENU[key]:
+                    flag = True
+                    stock = MENU[key][item]['stock']
+                    if quantity < int(stock):
+                        MENU[key][item]['stock'] -= 1
+                        if item in current.receipt:
+                            current.receipt[item] += quantity
+                            total = _get_subtotal(item)
+                            print(f'''{current.receipt[item]} orders of {item} has been added to your order. Your total is $ {total}''')
+                        else:
+                            current.receipt[item] = 1
+                            total = _get_subtotal(item)
+                            print(f'''{quantity} order of {item} has been aded to your order. Your roral is ${total}''')
+                    else:
+                        print('Sorry, we don\'t have that many.')
+            if flag is False:
+                raise KeyError('404, food not found.')
+        except(TypeError, KeyError):
+            raise KeyError('We don\'t, sell that.')
+
+    def remove_item(self, item, quantity):
+        for key, value in MENU.items():
+                if item in MENU[key]:
+                    if item not in current.receipt:
+                        raise ValueError('You haven\'t ordered any of those.')
+                if current.receipt[item] == 1:
+                    current.receipt['subtotal'] -= menu[key][item]['price']
+                    del current.receipt[item]
+                else:
+                    current.receipt[item] -= quantity
+                    current.receipt['subtotal'] -= MENU[key][item]['price'] * quantity
+                total = round(current.receipt['subtotal'], 2)
+                print(f'{quantity} order(s) of {item} has been removed from your meal. Your total is ${total}')
+
+    def display_order(self, receipt):
+        tax = round(_get_sales_tax(current.receipt['subtotal']), 2)
+
+        for key, value in current.receipt.items():
+            unit_cost = _calculate_line_item(key)
+            if unit_cost is not None:
+                print(unit_cost[0].ljust(40), '$', unit_cost[1] * current.receipt[key])
+        print('-' * 50)
+        print('Subtotal'.ljust(40), '$', round(current.receipt['subtotal'], 2))
+        print('Sales Tax'.ljust(40), '$', tax)
+        print('-' * 10)
+        print('Total Due'.ljust(40), '$', str(float(round(current.receipt['subtotal'] + tax))), 2)
+        print('*' * 50)
+
+    def print_receipt(self, receipt):
+
+        receipt_file = ''
+        receipt_file += (f'''\n {'*' * 50} \n The Snakes Cafe \n Order: {self.id} \n {'=' * 50}''')
+
+        subtotal = current.receipt['subtotal']
+        for key, value in current.receipt.items():
+            unit_cost = _calculate_line_item(key)
+            if unit_cost is not None:
+                # item = unit_cost[0]
+                price = unit_cost[1]
+                to_output = (f'''{key} x {value}''')
+                receipt_file += ('\n{:<25} {:>25.2f}'.format(to_output, price))
+        tax = subtotal * 0.096
+        receipt_file += ('\n' + '-' * 50 + '\nSubtotal {:>42.2f}'.format(subtotal))
+        receipt_file += ('\nSales Tax {:>41.2f}'.format(tax))
+        receipt_file += ('\n' + '-' * 10 + '\nTotal Due {:>41.2f}\n'.format(subtotal + tax))
+        with open(f'order-{current.id}.txt' + self.id + '.txt', 'w') as f:
+            f.write(receipt_file)
 
 
-initial_order = True
+current = Order()
 
 
-def take_order():
-    global no
+def _import_menu(file_path):
+    try:
+        with open(file_path, 'r') as f:
+            menu_import = csv.reader(f)
+            for row in menu_import:
+                item = iter(row[1:])
+                #https://docs.python.org/3.5/library/functions.html#iter
+                if row[0] in menu.keys():
+                    menu[row[0]].update(dict(zip(item, item)))
+                else:
+                    menu[row[0]] = dict(zip(item, item))
+            print_menu()
+
+    except (IndexError, FileNotFoundError) as error:
+        raise Exception('File not found or incorrect filetype; please use a CSV.')
+        what_menu()
+
+
+def what_menu():
+    greeting()
+    print('Would you like to import a menu?')
+    menu_choice = input(f'''{chr(3847)}   ''')
     global yes
-    global initial_order
-
-    ordering = True
-
-    while ordering:
-        phrase_one = 'What can I get ya?\n'
-        phrase_two = 'Anything else?\n'
-
-        if not initial_order:
-            item = input(f'''{phrase_two}''').lower()
-        else:
-            item = input(f'''{phrase_one}''').lower()
-
-        for i in range(len(MENU)):
-            for j in range(len(MENU[i])-1):
-                if(MENU[i][j+1]['item']).lower() == item:
-                    MENU[i][j+1]['count'] += 1
-                    print(dedent(f'''
-                        Ok, that\'s {str(MENU[i][j+1]['count'])}
-                        {str(MENU[i][j+1]['item'])}.
-                    '''))
-
-        initial_order = False
-
-        if item == 'yes':
-            print('What can I get ya?')
-
-        if item == 'no':
-            ordering = False
-            read_order()
-            break
-
-
-def read_order():
-    print('\nORDER\n')
-    for i in range(len(MENU)):
-            for j in range(len(MENU[i])-1):
-                if(MENU[i][j+1]['count']) > 0:
-
-                    print(MENU[i][j+1]['count'], MENU[i][j+1]['item'], (MENU[i][j+1]['count'] * MENU[i][j+1]['price']))
-
-
-def check_input(user_in):
-    if user_in.lower() == 'leave':
-        exit()
-
-
-def order_ready():
-    global yes
-    ready = input('Ready to order?\n')
-    if ready in yes:
-        take_order()
+    if menu_choice.lower() in yes:
+        print('What is the filepath?')
+        file_path = input(f'''{chr(3847)}   ''')
+        _import_menu(file_path)
     else:
-        print('look hun, we\'re busy so make up your mind.\n')
-        order_ready()
+        global MENU
+        MENU = D_MENU
+        print_menu()
 
 
-def give_menu():
+def _get_subtotal(item):
+    """
+    This function gets the subtotal of all purchased items.
+    """
+    try:
+        for key, value in MENU.items():
+            if item in MENU[key]:
+                current.receipt['subtotal'] += MENU[key][item]['price']
+        return round(current.receipt['subtotal'], 2)
+    except TypeError:
+        print('*points out window* Oh hey what\'s that! *runs away*')
 
-    print('MENU')
-    for i in range(len(MENU)):
 
-        print(dedent(f'''
-            {'-' * WIDTH}
-            {MENU[i][0]['header']}
-            {'-' * WIDTH}
-        '''))
-        for j in range(len(MENU[i])-1):
-            print(MENU[i][j+1]['item'])
-        print('-' * WIDTH)
+def _get_sales_tax(subtotal):
+
+    tax = subtotal * 0.101
+    return tax
+
+
+def _calculate_line_item(item):
+    """
+    This function gets each line item and its cost from the main menu.
+    Argument: An item
+    Output: The item and its per-unit price as a tuple
+    """
+    for key, value in MENU.items():
+        if item in MENU[key]:
+            item_name = item
+            unit_cost = MENU[key][item]['price']
+            return(item_name, unit_cost)
 
 
 def greeting():
@@ -197,26 +265,96 @@ def greeting():
     '''
 
     ln_one = 'Hey there! Welcome to sssssSneksss Cafe!'
+    ln_two = 'Have a ssseat!'
 
     print(dedent(f'''
         {'*' * WIDTH}
         {(' ' * ((WIDTH - len(ln_one)) // 2)) + ln_one +
             (' ' * ((WIDTH - len(ln_one)) // 2))}
+        {(' ' * ((WIDTH - len(ln_two)) // 2)) + ln_two +
+            (' ' * ((WIDTH - len(ln_two)) // 2))}
         {'*' * WIDTH}
+
     '''))
+
+
+# def ask_question(question):
+#     return input(question)
+
+
+def check_input(user_in):
+    global ordering
+
+    if user_in.lower() == 'quit' or user_in.lower() == 'leave':
+        exit()
+        return
+
+    elif user_in.lower() == 'menu':
+        print_menu()
+        return
+
+    if ordering is True:
+        found = False
+        for cat in MENU:
+            for food in MENU[cat]:
+                if user_in.lower() == food.lower():
+                    MENU[cat][food]['ordered'] += 1
+                    print(f'''Alrighty, that's {MENU[cat][food]['ordered']} {food}''')
+                    found = True
+                    break
+        if found is False:
+            print('Sorry, what was that?')
+
+        found = False
+
+    if user_in.lower() in no:
+        ordering = False
+        Order.display_order(current.receipt)
 
 
 def exit():
     print(dedent('''
-        Thanksss for ssstopping by!
+        Thanks for ssssssssstopping by!
     '''))
+    sys.exit()
+
+
+def print_menu():
+
+    for cat, value in MENU.items():
+        print('')
+        print(f'''{chr(8857)}   {cat}''')
+        print('')
+        for food in MENU[cat]:
+            print(dedent(f'''{food}{'.' *
+            (WIDTH - 1 -len(food) -
+            len(str(MENU[cat][food]['price'])))}${MENU[cat][food]['price']}'''))
+    print('')
+    take_order()
+
+
+def take_order():
+    global ordering
+    global no
+
+    initial_order = True
+
+    while ordering:
+        if initial_order:
+            print(SPE['01'])
+            check_input(input(f'''{chr(3847)}   '''))
+            initial_order = False
+        else:
+            print(SPE['02'])
+            check_input(input(f'''{chr(3847)}   '''))
 
 
 def run():
-    greeting()
-    give_menu()
-    order_ready()
-
+    what_menu()
+    print_menu()
 
 if __name__ == '__main__':
-    run()
+    try:
+        run()
+    except KeyboardInterrupt:
+        exit()
