@@ -16,27 +16,27 @@ default_menu = {
         {
             'noms': {
                 'price': 3.99,
-                'stock': 10
+                'stock': 25
             },
             'friedcrickets': {
                 'price': 3.99,
-                'stock': 10
+                'stock': 25
             },
             'mousebobs': {
                 'price': 4.99,
-                'stock': 10
+                'stock': 25
             },
             'cricketplatter': {
                 'price': 5.99,
-                'stock': 10
+                'stock': 25
             },
             'eggyweggs': {
                 'price': 3.99,
-                'stock': 10
+                'stock': 25
             },
             'froglegs': {
                 'price': 4.99,
-                'stock': 10
+                'stock': 25
             },
         },
 
@@ -44,27 +44,27 @@ default_menu = {
         {
             'roadkill': {
                 'price': 7.99,
-                'stock': 10
+                'stock': 56
             },
             'parrot': {
                 'price': 12.99,
-                'stock': 10
+                'stock': 16
             },
             'smallchild': {
                 'price': 23.99,
-                'stock': 10
+                'stock': 3
             },
             'monkey': {
                 'price': 19.99,
-                'stock': 10
+                'stock': 12
             },
             'dog': {
                 'price': 17.99,
-                'stock': 10
+                'stock': 35
             },
             'cat': {
                 'price': 14.99,
-                'stock': 10
+                'stock': 45
             },
         },
 
@@ -72,27 +72,27 @@ default_menu = {
         {
             'nomnoms': {
                 'price': 3.99,
-                'stock': 10
+                'stock': 100000000
             },
             'treefrog': {
                 'price': 5.99,
-                'stock': 10
+                'stock': 12
             },
             'cricketfries': {
                 'price': 5.99,
-                'stock': 10
+                'stock': 50
             },
             'kitten': {
                 'price': 8.99,
-                'stock': 10
+                'stock': 54
             },
             'puppy': {
                 'price': 8.99,
-                'stock': 10
+                'stock': 0
             },
             'infant': {
                 'price': 12.99,
-                'stock': 10
+                'stock': 2
             },
         },
 
@@ -100,27 +100,27 @@ default_menu = {
         {
             'micecream': {
                 'price': 5.99,
-                'stock': 10
+                'stock': 15
             },
             'frogyo': {
                 'price': 5.99,
-                'stock': 10
+                'stock': 45
             },
             'cake': {
                 'price': 5.99,
-                'stock': 10
+                'stock': 6
             },
             'milksnake': {
                 'price': 7.99,
-                'stock': 10
+                'stock': 85
             },
             'cococrickets': {
                 'price': 6.99,
-                'stock': 10
+                'stock': 4
             },
             'sssouffle': {
                 'price': 10.99,
-                'stock': 10
+                'stock': 2
             },
         },
 
@@ -128,34 +128,40 @@ default_menu = {
         {
             'water': {
                 'price': 0.99,
-                'stock': 10
+                'stock': 10000
             },
             'fanta': {
                 'price': 1.99,
-                'stock': 10
+                'stock': 50
             },
             'blep': {
                 'price': 5.99,
-                'stock': 10
+                'stock': 50
             },
             'superblep': {
                 'price': 5.99,
-                'stock': 10
+                'stock': 7
             },
             'rattlesnake': {
                 'price': 5.99,
-                'stock': 10
+                'stock': 7
             },
             'snakeeyes': {
                 'price': 5.99,
-                'stock': 10
+                'stock': 7
             },
         },
 }
 
 
 class Order:
+    '''
+    this is the order constructor
+    '''
     def __init__(self):
+        '''
+        instantiation
+        '''
         self.items = {}
         self.total = 0
         self.id = str(uuid.uuid4())
@@ -168,6 +174,9 @@ class Order:
         return len(self.items)
 
     def modify_order(self, prompt):
+        '''
+        When called, this will adjust the order. prompt takes one input as the item to modify, and a second optional as the nuber to add or subtract
+        '''
         try:
             item, quantity = prompt.split(
                 ' ')[0].lower(), int(prompt.split(' ')[1])
@@ -240,97 +249,50 @@ class Order:
                             print('We\'re all out of those')
 
     def display_order(self):
-
+        '''
+        prints the order to the user and saves it to a txt file.
+        If no file, will create,
+        if file, will overwrite.
+        Order instances are unique.
+        '''
         user_receipt = ''
         user_receipt += ('\n' + '*' * 50 + '\n' + 'The Python Diner' + '\n' + 'Order ' + str(self.id) + '\n' + '=' * 50)
-
+        sub_total = 0
+        taxed = 0
         for cat, value in menu.items():
             for food in menu[cat]:
                 if food in order.items:
-                    user_receipt += (f'''\n{self.items[food]}{food}{self.items[food] * menu[cat][food]['price']} \n''')
+                    user_receipt += (f'''\n{self.items[food]} {food} ... {self.items[food] * menu[cat][food]['price']}''')
+                    sub_total += self.items[food] * menu[cat][food]['price']
+
+        taxed = round((float(sub_total) * .096), 2)
+
+        user_receipt += ('\n' + '-' * 50)
+        user_receipt += ('\nSubtotal: {:>40.2f}'.format(round(sub_total, 2)))
+        user_receipt += ('\nTax: {:>45.2f}'.format(round(taxed, 2)))
+        user_receipt += ('\n' + '-' * 50)
+        user_receipt += ('\nTotal Due: {:>39.2f}'.format(round((sub_total + taxed), 2)))
+        user_receipt += ('\n' + '*' * 50)
 
         print(user_receipt)
-    # def display_order(self):
 
-    #     for item in self.items:
-    #         print(f'{self.items[item]} {item}')
-    #     print(f'Total: {round(self.total, 2)}')
-    #     take_order()
-
-# ////////////////////////////
-
-
-
-
-
-    # def print_receipt(self):
-    #     r = 50
-    #     print('Order', self.id)
-    #     print('=' * r)
-
-        # for cat, value in menu.items():
-        #     if (prompt.split(' ')[0].lower()) in (menu[cat].keys()):
-
-    #             print(dedent(f'''{food}{'.' *
-    #             (WIDTH - 1 -len(food) -
-    #             len(str(menu[cat][food]['price'])))} $
-
-#         for item in self.items:
-#             print(f'{self.items[item]} {item}')
-#         print(f'Total: {self.total}')
-#         ln_one = 'Python Diner'
-#         ln_two = 'sssuper goood'
-
-#         print(dedent(f'''
-#         {'=' * r}
-#         {(' ' * ((r - len(ln_one)) // 2)) + ln_one +
-#             (' ' * ((r - len(ln_one)) // 2))}
-#         {(' ' * ((r - len(ln_two)) // 2)) + ln_two +
-#             (' ' * ((r - len(ln_two)) // 2))}
-#         {'='* r}'''))
-
-# ///////////
-
-#     def receipt(self):
-#         user_receipt = ''
-#         user_receipt += ('\n' + '*' * 50 + '\n'
-#         + 'The Python Diner' + '\n' + 'Order ' + str(self.order_UUID) + '\n' + '=' * 50)
-#         subtotal = 0
-#         sales_tax = 0
-#         for item in self.Menu:
-#             if self.Menu[item][ITEM_ORDER_COUNT_INDEX] != 0:
-#                 self.print_item_in_order(item)
-#                 subtotal += self.Menu[item][ITEM_ORDER_COUNT_INDEX] * self.Menu[item][ITEM_PRICE_INDEX]
-#         sales_tax = subtotal * SALES_TAX
-#         user_receipt += ('\n' + '-' * 50 + '\nSubtotal {:>42.2f}'.format(subtotal))
-#         user_receipt += ('\nSales Tax {:>41.2f}'.format(sales_tax))
-#         user_receipt += ('\n' + '-' * 10 + '\nTotal Due {:>41.2f}\n'.format(subtotal + sales_tax))
-#         with open(f'order-{self.order_UUID}.txt', 'w') as f:
-#             f.write(user_receipt)
-
-# string.ljust(s, width[, fillchar])
-# string.rjust(s, width[, fillchar])
-# string.center(s, width[, fillchar])¶
-
-
-# ///////////////
-
-
-
-
-
+        with open(f'order-{self.id}.txt', 'w') as f:
+            f.write(user_receipt)
 
 
 order = Order()
 
 
 def take_order():
+    '''
+    First order and subsequent orders have different prompts.
+    '''
     global initial_order
 
     if initial_order:
         initial_order = False
         print('Ready to order? what can I get ya?\n')
-        print('<item_name> [+/-number]\n')
+        print(chr(8811) + '   <item_name> [ + or - integer ]\n')
 
     else:
         print('Anything else?\n')
@@ -359,7 +321,9 @@ def greet():
 
 
 def print_menu():
-
+    '''
+    prints the menu
+    '''
     for cat, value in menu.items():
         print('')
         print(f'''{chr(8857)}   {cat}''')
@@ -373,36 +337,43 @@ def print_menu():
 
 
 def menu_select():
+    '''
+    opening prompt called before menu selection in core()
+    '''
     print('To see our menu, enter \'see menu\'.')
     print('Or to load a menu, enter \'load menu\'')
 
 
 def load_external_menu(path):
-    try:
-        with open(path, 'r') as f:
-            menu_import = csv.reader(f)
-            for row in menu_import:
-                menu[row[0]]
-                # item = iter(row[1:])
-                # if row[0] in menu.keys():
-                #     menu[row[0]].update(dict(zip(item, item)))
-                # else:
-                #     menu[row[0]] = dict(zip(item, item))
-            print_menu()
+    global menu
+    global default_menu
+    print('feature not enabled')
+    menu = default_menu
+    # try:
+    #     with open(path, 'r') as f:
+    #         menu_import = csv.reader(f)
+    #         for row in menu_import:
+    #             menu[row[0]]
+    #             # item = iter(row[1:])
+    #             # if row[0] in menu.keys():
+    #             #     menu[row[0]].update(dict(zip(item, item)))
+    #             # else:
+    #             #     menu[row[0]] = dict(zip(item, item))
+    #         print_menu()
 
-    except (IndexError, FileNotFoundError):
-        raise Exception('Err: Check file path, ensure CSV format')
+    # except (IndexError, FileNotFoundError):
+    #     raise Exception('Err: Check file path, ensure CSV format')
 
 
 def core():
-    global menu_set
-    global default_menu
-    global menu
     """
     This function drives the app.
     All input is routed here and used to run the appropriate functions.
     It is the backbone of the program
     """
+    global menu_set
+    global default_menu
+    global menu
     greet()
     menu_select()
 
@@ -448,6 +419,9 @@ def core():
 
 
 def exit():
+    '''
+    exits the app
+    '''
     print(dedent('''
         Thanks for ssssssssstopping by!
     '''))
@@ -455,6 +429,10 @@ def exit():
 
 
 if __name__ == '__main__':
+    '''
+    run : core
+    keu exit : polite
+    '''
     try:
         core()
     except KeyboardInterrupt:
